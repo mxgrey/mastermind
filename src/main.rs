@@ -121,10 +121,19 @@ struct Combo<'a, 'b> {
     combination: &'b Vec<u8>,
 }
 
+impl<'a, 'b> Combo<'a, 'b> {
+    fn new<'c, 'd>(style: &'c Style, combination: &'d Vec<u8>) -> Combo<'c, 'd> {
+        return Combo{
+            style: style,
+            combination: combination,
+        };
+    }
+}
+
 impl<'a, 'b> fmt::Display for Combo<'a, 'b> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for i in self.combination.iter() {
-            if let Err(fmt::Error) = write!(f, "{} ", self.style.reps[*i as usize]) {
+            if let Err(fmt::Error) = write!(f, " {} ", self.style.reps[*i as usize]) {
                 return Err(fmt::Error);
             }
         }
@@ -289,7 +298,7 @@ fn decide(remaining_subset: &Subset, style: &Style) -> u32 {
 
     for candidate in best_choices.candidates.iter() {
         // println!("{:?}", all_combinations[*candidate as usize]);
-        println!("{}\n", Combo{style: style, combination: &all_combinations[*candidate as usize]});
+        println!(" {}\n", Combo{style: style, combination: &all_combinations[*candidate as usize]});
     }
 
     for candidate in best_choices.candidates.iter() {
@@ -312,33 +321,33 @@ fn main() {
     let style = Style{
         reps: vec![
             Representation{
-                fg_color: Box::new(color::White{}),
-                bg_color: Box::new(color::Red{}),
+                fg_color: Box::new(color::Black{}),
+                bg_color: Box::new(color::LightRed{}),
                 text: String::from("R"),
             },
             Representation{
-                fg_color: Box::new(color::White{}),
+                fg_color: Box::new(color::Black{}),
                 bg_color: Box::new(color::Green{}),
                 text: String::from("G"),
             },
             Representation{
                 fg_color: Box::new(color::Black{}),
-                bg_color: Box::new(color::Yellow{}),
+                bg_color: Box::new(color::LightYellow{}),
                 text: String::from("Y"),
             },
             Representation{
-                fg_color: Box::new(color::White{}),
-                bg_color: Box::new(color::Blue{}),
+                fg_color: Box::new(color::Black{}),
+                bg_color: Box::new(color::LightBlue{}),
                 text: String::from("B"),
             },
             Representation{
                 fg_color: Box::new(color::Black{}),
-                bg_color: Box::new(color::Magenta{}),
-                text: String::from("M"),
+                bg_color: Box::new(color::LightMagenta{}),
+                text: String::from("P"),
             },
             Representation{
                 fg_color: Box::new(color::Black{}),
-                bg_color: Box::new(color::Cyan{}),
+                bg_color: Box::new(color::LightCyan{}),
                 text: String::from("C"),
             },
         ],
@@ -360,7 +369,7 @@ fn main() {
         println!("Guess index: {}", guess_index);
         let choice = &initial_set.combinations[guess_index as usize];
 
-        println!("Guessing: {:?}", choice);
+        println!("Guessing: {}", Combo::new(&style, choice));
         
         let score = Score::compute(&choice, &answer);
         println!("Score: {}", score);
@@ -379,10 +388,10 @@ fn main() {
     if remaining_set.members.len() > 1 {
         println!("Remaining combinations:");
         for m in remaining_set.members.iter() {
-            println!("{:?}", initial_set.combinations[*m as usize]);
+            println!("{}", Combo::new(&style, &initial_set.combinations[*m as usize]));
         }
         println!("\nNumber of remaining combinations: {}", remaining_set.members.len());
     }
 
-    println!("Correct answer: {:?}", answer);
+    println!("Correct answer: {}", Combo::new(&style, &answer));
 }
