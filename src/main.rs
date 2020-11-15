@@ -86,29 +86,15 @@ struct Representation {
 
 impl fmt::Display for Representation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if let Err(fmt::Error) = self.fg_color.write_fg(f) {
-            return Err(fmt::Error);
-        }
+        self.fg_color.write_fg(f)?;
+        self.bg_color.write_bg(f)?;
+        f.write_str(&self.text)?;
 
-        if let Err(fmt::Error) = self.bg_color.write_bg(f) {
-            return Err(fmt::Error);
-        }
+        let reset = color::Reset {};
+        reset.write_fg(f)?;
+        reset.write_bg(f)?;
 
-        if let Err(fmt::Error) = f.write_str(&self.text) {
-            return Err(fmt::Error);
-        }
-
-        let reset = color::Reset{};
-
-        if let Err(fmt::Error) = reset.write_fg(f) {
-            return Err(fmt::Error);
-        }
-
-        if let Err(fmt::Error) = reset.write_bg(f) {
-            return Err(fmt::Error);
-        }
-        
-        return Ok(());
+        Ok(())
     }
 }
 
